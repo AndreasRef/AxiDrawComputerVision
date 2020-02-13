@@ -4,7 +4,7 @@ import de.looksgood.ani.*;
 import processing.serial.*;
 
 // User Settings: 
-float MotorSpeed = 4000.0;  // Steps per second, 1500 default
+float MotorSpeed = 6000.0;  // Steps per second, 1500 default
 
 int ServoUpPct = 70;    // Brush UP position, %  (higher number lifts higher). 
 int ServoPaintPct = 30;    // Brush DOWN position, %  (higher number lifts higher). 
