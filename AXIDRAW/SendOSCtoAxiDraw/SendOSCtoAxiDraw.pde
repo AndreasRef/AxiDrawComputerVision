@@ -11,6 +11,7 @@ ArrayList<PVector> vectors = new ArrayList<PVector>();
 
 void setup() {
   size(600, 400);
+  surface.setLocation(0, 0);
   oscP5 = new OscP5(this, 9000);
   dest = new NetAddress("127.0.0.1", 12000);
 
@@ -32,10 +33,10 @@ void setup() {
   vectors.add(new PVector(400, 200));
   vectors.add(new PVector(450, 200));
   vectors.add(new PVector(450, 250));
-  vectors.add(new PVector(0, 0));
 }
 
 void draw() {
+  
 }
 
 void mousePressed() {  
@@ -44,14 +45,17 @@ void mousePressed() {
 }
 
 void sendOsc(ArrayList<PVector> _vectors) { //send from an flexible ArrayList
-  OscMessage msg = new OscMessage("/drawVertex");
-
-  for (int i =0; i<_vectors.size(); i++) { //Remember to cast to ints!
-    msg.add((int)_vectors.get(i).x);
-    msg.add((int)_vectors.get(i).y);
+  if (_vectors.size()>0) {
+    OscMessage msg = new OscMessage("/drawVertex");
+    for (int i =0; i<_vectors.size(); i++) { //Remember to cast to ints!
+      msg.add((int)_vectors.get(i).x);
+      msg.add((int)_vectors.get(i).y);
+    }
+    oscP5.send(msg, dest);
+    println("message sent " + msg);
+  } else {
+    println("vector not containing anything, message not sent");
   }
-  oscP5.send(msg, dest);
-  println("message sent " + msg);
 }
 
 
@@ -62,9 +66,8 @@ void sendOsc(int[] _positions) { //most basic stripped down method with array
   println("message sent " + msg);
 }
 
-
 /*
-  Sloppy way to split the list into sublist based on special (0,0) vector
+ Sloppy way of splitting the list into sublist based on special (0,0) vector
  Hopefully I can make it more rouboust, 
  see https://discourse.processing.org/t/splitting-an-arraylist-for-each-pvector-0-0-updated/17883
  */

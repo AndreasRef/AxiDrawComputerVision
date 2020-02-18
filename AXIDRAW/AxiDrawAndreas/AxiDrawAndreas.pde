@@ -4,6 +4,7 @@ PVector[] vectors = new PVector[3];
 
 void setup() {
   size(800, 631);
+  surface.setLocation(displayWidth-width,0);
   setupAxi();
   oscP5 = new OscP5(this, 12000);
 
