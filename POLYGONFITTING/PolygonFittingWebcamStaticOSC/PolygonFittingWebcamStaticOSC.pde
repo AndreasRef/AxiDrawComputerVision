@@ -22,6 +22,7 @@ Boolean webcamMode = false;
 
 void setup() {
   size(640, 480);
+  surface.setLocation(0, 0);
   
   oscP5 = new OscP5(this,9000);
   dest = new NetAddress("127.0.0.1", 12000);
@@ -99,17 +100,22 @@ void draw() {
 }
 
 void mousePressed() {
-  sendOsc(vectors);
+  //sendOsc(vectors);
+  splitByDelimiterAndSendOSC(vectors);
 }
 
 void sendOsc(ArrayList<PVector> _vectors) { //send from an flexible ArrayList
-  OscMessage msg = new OscMessage("/drawVertex");
-  for (int i =0; i<_vectors.size(); i++) { //Remember to cast to ints!
-    msg.add((int)_vectors.get(i).x);
-    msg.add((int)_vectors.get(i).y);
+  if (_vectors.size()>0) {
+    OscMessage msg = new OscMessage("/drawVertex");
+    for (int i =0; i<_vectors.size(); i++) { //Remember to cast to ints!
+      msg.add((int)_vectors.get(i).x);
+      msg.add((int)_vectors.get(i).y);
+    }
+    oscP5.send(msg, dest);
+    println("message sent " + msg);
+  } else {
+    println("vector not containing anything, message not sent");
   }
-  oscP5.send(msg, dest);
-  println("message sent " + msg);
 }
 
 void drawOuterPolygons() {
@@ -150,21 +156,60 @@ void drawPolygonsUsingLines(List<EllipseRotated_F64> ellipses) {
       beginShape();
       for ( Point2D_I32 p : poly) {
         PVector pointVec = new PVector(p.x*scaleFactor + translateVector.x, p.y*scaleFactor + translateVector.y);
-        vertex(p.x*scaleFactor + translateVector.x, p.y*scaleFactor + translateVector.y);
+        vertex(pointVec.x, pointVec.y);
         vectors.add(pointVec);
       }
       
-      
-      
       // close the loop
       Point2D_I32 p = poly.get(0);
-      vertex( p.x*scaleFactor + translateVector.x, p.y*scaleFactor + translateVector.y);
+      PVector pointVec = new PVector(p.x*scaleFactor + translateVector.x, p.y*scaleFactor + translateVector.y);
+      vertex(pointVec.x, pointVec.y);
+      vectors.add(pointVec);
       endShape();
+      vectors.add(new PVector(0,0)); //Add the break vector to ensure that lines are not all connected
     }
-    vectors.add(new PVector(0,0));
   }
 }
 
 
 void keyPressed() {
+}
+
+/*
+ Sloppy way of splitting the list into sublist based on special (0,0) vector
+ Hopefully I can make it more rouboust, 
+ see https://discourse.processing.org/t/splitting-an-arraylist-for-each-pvector-0-0-updated/17883
+ */
+void splitByDelimiterAndSendOSC(ArrayList<PVector> _vectors) { //send from sublists, split by zeroVector
+
+  PVector zeroVector = new PVector(0, 0);
+  IntList breakPoints = new IntList();
+  breakPoints.clear();
+  for (int i = 0; i<_vectors.size(); i++) {
+    if (_vectors.get(i).equals(zeroVector)) {
+      //1 find all places to split and store them in breakPoints
+      breakPoints.append(i);
+    }
+  }
+  if (breakPoints.size() > 0) {
+    int lastBreakpoint = 0;
+    for (int i = 0; i<breakPoints.size() + 1; i++) { 
+      //2 create new ArrayList and populate them with the correct subLists
+      ArrayList<PVector> mySubList = new ArrayList<PVector>();
+      if (i == 0) { //first sublist
+        mySubList = new ArrayList(_vectors.subList(i, breakPoints.get(i)));
+        lastBreakpoint = breakPoints.get(i);
+      } else if (i<breakPoints.size()) { // all middle cases
+        println("i " + i + "    " + "breakPoint " + breakPoints.get(i));
+        mySubList = new ArrayList(_vectors.subList(lastBreakpoint+1, breakPoints.get(i)));
+        lastBreakpoint = breakPoints.get(i);
+      } else { //last sublist
+        mySubList = new ArrayList(_vectors.subList(lastBreakpoint + 1, _vectors.size()));
+        lastBreakpoint = i;
+      }
+      println("list " + i + ": " + mySubList);
+      sendOsc(mySubList);
+      mySubList.clear();
+    }
+  }
 }
