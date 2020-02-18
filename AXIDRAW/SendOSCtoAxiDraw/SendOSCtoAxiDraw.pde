@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import oscP5.*;
 import netP5.*;
 
-IntList breakPoints;
-PVector zeroVector = new PVector(0, 0);
 OscP5 oscP5;
 NetAddress dest;
 ArrayList<PVector> vectors = new ArrayList<PVector>();
@@ -15,9 +13,6 @@ void setup() {
   oscP5 = new OscP5(this, 9000);
   dest = new NetAddress("127.0.0.1", 12000);
 
-  breakPoints = new IntList();
-
-  vectors.add(new PVector(0, 0));
   vectors.add(new PVector(100, 100));
   vectors.add(new PVector(150, 100));
   vectors.add(new PVector(150, 150));
@@ -36,7 +31,6 @@ void setup() {
 }
 
 void draw() {
-  
 }
 
 void mousePressed() {  
@@ -73,16 +67,19 @@ void sendOsc(int[] _positions) { //most basic stripped down method with array
  */
 void splitByDelimiterAndSendOSC(ArrayList<PVector> _vectors) { //send from sublists, split by zeroVector
 
-  //1 find all places to split and store them in breakPoints
+  PVector zeroVector = new PVector(0, 0);
+  IntList breakPoints = new IntList();
   breakPoints.clear();
   for (int i = 0; i<_vectors.size(); i++) {
     if (_vectors.get(i).equals(zeroVector)) {
+      //1 find all places to split and store them in breakPoints
       breakPoints.append(i);
     }
   }
   if (breakPoints.size() > 0) {
     int lastBreakpoint = 0;
-    for (int i = 0; i<breakPoints.size() + 1; i++) { //2 create breakPoints.size()+1 new ArrayLists 
+    for (int i = 0; i<breakPoints.size() + 1; i++) { 
+      //2 create new ArrayList and populate them with the correct subLists
       ArrayList<PVector> mySubList = new ArrayList<PVector>();
       if (i == 0) { //first sublist
         mySubList = new ArrayList(_vectors.subList(i, breakPoints.get(i)));
