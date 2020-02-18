@@ -6,7 +6,6 @@ PVector zeroVector = new PVector(0, 0);
 void setup() {
   breakPoints = new IntList();
 
-  vectors.add(new PVector(0, 0));
   vectors.add(new PVector(100, 100));
   vectors.add(new PVector(150, 100));
   vectors.add(new PVector(150, 150));
@@ -23,7 +22,6 @@ void setup() {
   
   vectors.add(new PVector(350, 150));
   
-  vectors.add(new PVector(0, 0));
 
 
   //1 find all places to split and store them in breakPoints
