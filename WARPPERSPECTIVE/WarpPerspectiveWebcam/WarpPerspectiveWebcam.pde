@@ -1,6 +1,5 @@
 //To do
 //Switch between static mode and webcam mode
-//Think about layout...
 //Save positions after closing program
 //p5gui?
 //perform openCV stuff on outputImage
@@ -18,17 +17,17 @@ Capture video;
 OpenCV opencv;
 PImage staticImage;
 PImage output;
-int outputWidth = 250;
-int outputHeight = 150;
+int outputWidth = 640;
+int outputHeight = 360;
 
 Contour contour;
-ArrayList<PVector> perspectiveVectors = new ArrayList<PVector>();
+ArrayList<PVector> perspectiveVecs = new ArrayList<PVector>();
 boolean cvCalculated = false;
 Boolean webcamMode = true;
 
 void setup() {
-  size(1200, 600);
-
+  size(640, 720);
+  surface.setLocation(0, 100);
   if (webcamMode) {
     String[] cameras = Capture.list();
     video = new Capture(this, 640, 360, cameras[0]);
@@ -37,16 +36,15 @@ void setup() {
     staticImage = loadImage("paper.jpg");
     cvCalculated = true;
   }
-  
   /*Order of the Vectors seems to be important...?
    1------0          
    |      |
    2------3
    */
-  perspectiveVectors.add(new PVector(500.0, 10.0));   //0: Top right
-  perspectiveVectors.add(new PVector(10.0, 10.0));    //1: Top left
-  perspectiveVectors.add(new PVector(10.0, 350.0));   //2: Bottom right
-  perspectiveVectors.add(new PVector(500.0, 350.0));  //3: Bottom left
+  perspectiveVecs.add(new PVector(500.0, 10.0));   //0: Top right
+  perspectiveVecs.add(new PVector(10.0, 10.0));    //1: Top left
+  perspectiveVecs.add(new PVector(10.0, 350.0));   //2: Bottom right
+  perspectiveVecs.add(new PVector(500.0, 350.0));  //3: Bottom left
 }
 
 void draw() {
@@ -60,15 +58,15 @@ void draw() {
   }
   
   fill(0, 255, 0);
-  for (int i = 0; i < perspectiveVectors.size(); i++) {
-    ellipse(perspectiveVectors.get(i).x, perspectiveVectors.get(i).y, 15, 15);
-    text(i, perspectiveVectors.get(i).x + 10, perspectiveVectors.get(i).y);
+  for (int i = 0; i < perspectiveVecs.size(); i++) {
+    ellipse(perspectiveVecs.get(i).x, perspectiveVecs.get(i).y, 15, 15);
+    text(i, perspectiveVecs.get(i).x + 10, perspectiveVecs.get(i).y);
   }
 
   if (cvCalculated) performCV();
 
   pushMatrix();
-  translate(900, 0); //Update this
+  translate(0, 360);
   if (cvCalculated) image(output, 0, 0);
   popMatrix();
   setLazyPoints();
@@ -87,15 +85,15 @@ void performCV() {
   opencv.blur(1);
   opencv.threshold(120);
   output = createImage(outputWidth, outputHeight, ARGB);  
-  opencv.toPImage(warpPerspective(perspectiveVectors, outputWidth, outputHeight), output);
+  opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
 }
 
 void setLazyPoints() {
   if (mousePressed) {
-    for (int i = 0; i < perspectiveVectors.size(); i++) {
-      if (dist(mouseX, mouseY, perspectiveVectors.get(i).x, perspectiveVectors.get(i).y)<50) {
-        perspectiveVectors.get(i).set(mouseX, mouseY);
-        opencv.toPImage(warpPerspective(perspectiveVectors, outputWidth, outputHeight), output);
+    for (int i = 0; i < perspectiveVecs.size(); i++) {
+      if (dist(mouseX, mouseY, perspectiveVecs.get(i).x, perspectiveVecs.get(i).y)<50) {
+        perspectiveVecs.get(i).set(mouseX, mouseY);
+        opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
       }
     }
   }
