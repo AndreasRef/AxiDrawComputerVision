@@ -33,7 +33,6 @@ void setup() {
     println(vecs1d); //This is where we get the correct lists..
     sendOsc(vecs1d);
   }
-  
   exit();
 }
 
