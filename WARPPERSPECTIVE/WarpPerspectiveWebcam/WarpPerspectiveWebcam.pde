@@ -1,80 +1,101 @@
+//To do
+//Switch between static mode and webcam mode
+//Think about layout...
+//Save positions after closing program
+//p5gui?
+//perform openCV stuff on outputImage
+
 import processing.video.*;
 import gab.opencv.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
-
 import org.opencv.core.Mat;
 import org.opencv.core.CvType;
 
 Capture video;
-
 OpenCV opencv;
-PImage src;
-PImage card;
-int cardWidth = 250;
-int cardHeight = 150;
+PImage staticImage;
+PImage output;
+int outputWidth = 250;
+int outputHeight = 150;
 
 Contour contour;
-
-ArrayList<PVector> myVectors = new ArrayList<PVector>();
-
+ArrayList<PVector> perspectiveVectors = new ArrayList<PVector>();
 boolean cvCalculated = false;
+Boolean webcamMode = true;
 
 void setup() {
   size(1200, 600);
-  
-  String[] cameras = Capture.list();
-  video = new Capture(this, 640, 360, cameras[0]);
-  video.start();
-  
-  src = loadImage("paper.jpg");
- 
-  //Order seems to be important...?
-  myVectors.add(new PVector(314.0, 344.0)); //Bottom left
-  myVectors.add(new PVector(83.0, 370.0)); //Top left
-  myVectors.add(new PVector(98.0, 594.0)); //Top right
-  myVectors.add(new PVector(353.0, 552.0)); //Bottom right
 
+  if (webcamMode) {
+    String[] cameras = Capture.list();
+    video = new Capture(this, 640, 360, cameras[0]);
+    video.start();
+  } else {
+    staticImage = loadImage("paper.jpg");
+    cvCalculated = true;
+  }
   
+  /*Order of the Vectors seems to be important...?
+   1------0          
+   |      |
+   2------3
+   */
+  perspectiveVectors.add(new PVector(500.0, 10.0));   //0: Top right
+  perspectiveVectors.add(new PVector(10.0, 10.0));    //1: Top left
+  perspectiveVectors.add(new PVector(10.0, 350.0));   //2: Bottom right
+  perspectiveVectors.add(new PVector(500.0, 350.0));  //3: Bottom left
 }
 
 void draw() {
-  image(src, 0, 0);
-  image(video, 0, 0);
+  if (webcamMode) {
+    if (video.available() == true) {
+      video.read();
+    }
+    image(video, 0, 0);
+  } else {
+    image(staticImage, 0, 0);
+  }
+  
   fill(0, 255, 0);
-  for (int i = 0; i < myVectors.size(); i++) {
-    ellipse(myVectors.get(i).x, myVectors.get(i).y, 15, 15);
-    text(i, myVectors.get(i).x + 10, myVectors.get(i).y);
+  for (int i = 0; i < perspectiveVectors.size(); i++) {
+    ellipse(perspectiveVectors.get(i).x, perspectiveVectors.get(i).y, 15, 15);
+    text(i, perspectiveVectors.get(i).x + 10, perspectiveVectors.get(i).y);
   }
 
+  if (cvCalculated) performCV();
+
   pushMatrix();
-  translate(src.width, 0);
-  if (cvCalculated) image(card, 0, 0);
+  translate(900, 0); //Update this
+  if (cvCalculated) image(output, 0, 0);
   popMatrix();
   setLazyPoints();
 }
 
 void keyPressed() {
-  performCV();
   cvCalculated = true;
 }
 
 void performCV() {
-  opencv = new OpenCV(this, video);
+  if (webcamMode) {
+    opencv = new OpenCV(this, video);
+  } else {
+    opencv = new OpenCV(this, staticImage);
+  }
   opencv.blur(1);
   opencv.threshold(120);
-  card = createImage(cardWidth, cardHeight, ARGB);  
-  opencv.toPImage(warpPerspective(myVectors, cardWidth, cardHeight), card);
+  output = createImage(outputWidth, outputHeight, ARGB);  
+  opencv.toPImage(warpPerspective(perspectiveVectors, outputWidth, outputHeight), output);
 }
 
 void setLazyPoints() {
   if (mousePressed) {
-    for (int i = 0; i < myVectors.size(); i++) {
-      if (dist(mouseX, mouseY, myVectors.get(i).x, myVectors.get(i).y)<50) {
-        myVectors.get(i).set(mouseX, mouseY);
-        opencv.toPImage(warpPerspective(myVectors, cardWidth, cardHeight), card);
+    for (int i = 0; i < perspectiveVectors.size(); i++) {
+      if (dist(mouseX, mouseY, perspectiveVectors.get(i).x, perspectiveVectors.get(i).y)<50) {
+        perspectiveVectors.get(i).set(mouseX, mouseY);
+        opencv.toPImage(warpPerspective(perspectiveVectors, outputWidth, outputHeight), output);
       }
     }
   }
@@ -103,9 +124,4 @@ Mat warpPerspective(ArrayList<PVector> inputPoints, int w, int h) {
   Mat unWarpedMarker = new Mat(w, h, CvType.CV_8UC1);    
   Imgproc.warpPerspective(opencv.getColor(), unWarpedMarker, transform, new Size(w, h));
   return unWarpedMarker;
-}
-
-
-void captureEvent(Capture c) {
-  c.read();
 }
