@@ -82,10 +82,20 @@ void performCV() {
   } else {
     opencv = new OpenCV(this, staticImage);
   }
+  //opencv.blur(1);
+  //opencv.threshold(120);
+  
+  output = createImage(outputWidth, outputHeight, ARGB);
+  //opencv.loadImage(video);
+  opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
+  
+  //Post effects
+  opencv.loadImage(output);
+  //opencv.brightness((int)map(mouseX, 0, width, -255, 255));
   opencv.blur(1);
   opencv.threshold(120);
-  output = createImage(outputWidth, outputHeight, ARGB);  
-  opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
+  output = opencv.getOutput();
+  
 }
 
 void setLazyPoints() {
