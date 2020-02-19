@@ -25,8 +25,11 @@ ArrayList<PVector> perspectiveVecs = new ArrayList<PVector>();
 boolean cvCalculated = false;
 Boolean webcamMode = true;
 
+Table table; //Table for storing perspectivePoints
+
 void setup() {
   size(640, 720);
+  loadData();
   surface.setLocation(0, 100);
   if (webcamMode) {
     String[] cameras = Capture.list();
@@ -34,17 +37,9 @@ void setup() {
     video.start();
   } else {
     staticImage = loadImage("paper.jpg");
+    staticImage.resize(640,360);
     cvCalculated = true;
   }
-  /*Order of the Vectors seems to be important...?
-   1------0          
-   |      |
-   2------3
-   */
-  perspectiveVecs.add(new PVector(500.0, 10.0));   //0: Top right
-  perspectiveVecs.add(new PVector(10.0, 10.0));    //1: Top left
-  perspectiveVecs.add(new PVector(10.0, 350.0));   //2: Bottom right
-  perspectiveVecs.add(new PVector(500.0, 350.0));  //3: Bottom left
 }
 
 void draw() {
@@ -82,8 +77,6 @@ void performCV() {
   } else {
     opencv = new OpenCV(this, staticImage);
   }
-  //opencv.blur(1);
-  //opencv.threshold(120);
   
   output = createImage(outputWidth, outputHeight, ARGB);
   //opencv.loadImage(video);
@@ -91,22 +84,74 @@ void performCV() {
   
   //Post effects
   opencv.loadImage(output);
-  //opencv.brightness((int)map(mouseX, 0, width, -255, 255));
-  opencv.blur(1);
+  opencv.blur(5);
   opencv.threshold(120);
   output = opencv.getOutput();
-  
 }
 
 void setLazyPoints() {
-  if (mousePressed) {
+  if (mousePressed && cvCalculated) {
     for (int i = 0; i < perspectiveVecs.size(); i++) {
       if (dist(mouseX, mouseY, perspectiveVecs.get(i).x, perspectiveVecs.get(i).y)<50) {
         perspectiveVecs.get(i).set(mouseX, mouseY);
         opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
       }
     }
+    saveData();
   }
+}
+
+void loadData() {
+  
+  table = loadTable("data.csv", "header");  
+  //println(table.getRowCount());
+  for (TableRow row : table.rows()) {
+    float x = row.getInt(0);
+    float y = row.getInt(1);
+    perspectiveVecs.add(new PVector(x, y)); 
+  }
+  
+  /*Order of the Vectors seems to be important...?
+   1------0          
+   |      |
+   2------3
+   
+   
+  perspectiveVecs.add(new PVector(500.0, 10.0));   //0: Top right
+  perspectiveVecs.add(new PVector(10.0, 10.0));    //1: Top left
+  perspectiveVecs.add(new PVector(10.0, 350.0));   //2: Bottom right
+  perspectiveVecs.add(new PVector(500.0, 350.0));  //3: Bottom left
+  */
+  
+}
+
+void saveData() {
+  table = new Table();
+  table.addColumn("x", Table.INT);
+  table.addColumn("y", Table.INT);
+
+  for (int i = 0; i<4; i++) {
+    TableRow row = table.addRow();
+    row.setInt("x", (int) perspectiveVecs.get(i).x);
+    row.setInt("y", (int) perspectiveVecs.get(i).y);
+  }
+  
+  saveTable(table, "data/data.csv");
+  
+  /*
+  table = loadTable("data.csv"); //not elegant
+  table.clearRows();
+  
+  for (int i = 0; i < perspectiveVecs.size(); i++) {
+    TableRow row = table.addRow();
+    row.setInt((int) perspectiveVecs.get(i).x, (int) perspectiveVecs.get(i).y);
+    //row.setInt();
+  }
+  
+  saveTable(table, "data/data.csv");
+  
+  */
+  
 }
 
 Mat getPerspectiveTransformation(ArrayList<PVector> inputPoints, int w, int h) {
