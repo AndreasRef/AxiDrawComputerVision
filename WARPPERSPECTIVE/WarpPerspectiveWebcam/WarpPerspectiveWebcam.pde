@@ -1,8 +1,7 @@
 //To do
-//Switch between static mode and webcam mode
-//Save positions after closing program
-//p5gui?
-//perform openCV stuff on outputImage
+//Function to calculate outPut coordinates to paper coordinates
+//Add osc functionality
+//Basic proof of concept example (but with which example)
 
 import processing.video.*;
 import gab.opencv.*;
@@ -29,15 +28,17 @@ Table table; //Table for storing perspectivePoints
 
 void setup() {
   size(640, 720);
-  loadData();
+  loadPerspectiveVecs();
   surface.setLocation(0, 100);
   if (webcamMode) {
     String[] cameras = Capture.list();
     video = new Capture(this, 640, 360, cameras[0]);
     video.start();
+    opencv = new OpenCV(this, video);
   } else {
     staticImage = loadImage("paper.jpg");
     staticImage.resize(640,360);
+    opencv = new OpenCV(this, staticImage);
     cvCalculated = true;
   }
 }
@@ -73,13 +74,12 @@ void keyPressed() {
 
 void performCV() {
   if (webcamMode) {
-    opencv = new OpenCV(this, video);
+    opencv.loadImage(video);
   } else {
-    opencv = new OpenCV(this, staticImage);
+    opencv.loadImage(staticImage);
   }
   
   output = createImage(outputWidth, outputHeight, ARGB);
-  //opencv.loadImage(video);
   opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
   
   //Post effects
@@ -97,11 +97,11 @@ void setLazyPoints() {
         opencv.toPImage(warpPerspective(perspectiveVecs, outputWidth, outputHeight), output);
       }
     }
-    saveData();
+    savePerspectiveVecs();
   }
 }
 
-void loadData() {
+void loadPerspectiveVecs() {
   
   table = loadTable("data.csv", "header");  
   //println(table.getRowCount());
@@ -116,7 +116,6 @@ void loadData() {
    |      |
    2------3
    
-   
   perspectiveVecs.add(new PVector(500.0, 10.0));   //0: Top right
   perspectiveVecs.add(new PVector(10.0, 10.0));    //1: Top left
   perspectiveVecs.add(new PVector(10.0, 350.0));   //2: Bottom right
@@ -125,7 +124,7 @@ void loadData() {
   
 }
 
-void saveData() {
+void savePerspectiveVecs() {
   table = new Table();
   table.addColumn("x", Table.INT);
   table.addColumn("y", Table.INT);
@@ -135,23 +134,7 @@ void saveData() {
     row.setInt("x", (int) perspectiveVecs.get(i).x);
     row.setInt("y", (int) perspectiveVecs.get(i).y);
   }
-  
-  saveTable(table, "data/data.csv");
-  
-  /*
-  table = loadTable("data.csv"); //not elegant
-  table.clearRows();
-  
-  for (int i = 0; i < perspectiveVecs.size(); i++) {
-    TableRow row = table.addRow();
-    row.setInt((int) perspectiveVecs.get(i).x, (int) perspectiveVecs.get(i).y);
-    //row.setInt();
-  }
-  
-  saveTable(table, "data/data.csv");
-  
-  */
-  
+  saveTable(table, "data/data.csv");  
 }
 
 Mat getPerspectiveTransformation(ArrayList<PVector> inputPoints, int w, int h) {
