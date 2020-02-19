@@ -20,6 +20,8 @@ Contour contour;
 
 ArrayList<PVector> myVectors = new ArrayList<PVector>();
 
+boolean cvCalculated = false;
+
 void setup() {
   size(1200, 600);
   
@@ -35,14 +37,7 @@ void setup() {
   myVectors.add(new PVector(98.0, 594.0)); //Top right
   myVectors.add(new PVector(353.0, 552.0)); //Bottom right
 
-  opencv = new OpenCV(this, src);
-
-  opencv.blur(1);
-  opencv.threshold(120);
-
-  card = createImage(cardWidth, cardHeight, ARGB);  
-
-  opencv.toPImage(warpPerspective(myVectors, cardWidth, cardHeight), card);
+  
 }
 
 void draw() {
@@ -56,9 +51,22 @@ void draw() {
 
   pushMatrix();
   translate(src.width, 0);
-  image(card, 0, 0);
+  if (cvCalculated) image(card, 0, 0);
   popMatrix();
   setLazyPoints();
+}
+
+void keyPressed() {
+  performCV();
+  cvCalculated = true;
+}
+
+void performCV() {
+  opencv = new OpenCV(this, video);
+  opencv.blur(1);
+  opencv.threshold(120);
+  card = createImage(cardWidth, cardHeight, ARGB);  
+  opencv.toPImage(warpPerspective(myVectors, cardWidth, cardHeight), card);
 }
 
 void setLazyPoints() {
