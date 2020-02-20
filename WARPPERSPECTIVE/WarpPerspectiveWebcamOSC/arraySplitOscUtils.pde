@@ -1,3 +1,27 @@
+void splitListsAndSendOSC(List<PVector> _vectors) {
+  final int[] delimIndexes = indicesOf(_vectors, DELIM_VEC);
+  List<List<PVector>> vecs2d = splitListAsList2d(_vectors, delimIndexes);
+
+  for (int size = vecs2d.size(), i = 0; i < size; ++i) {
+    final List<PVector> vecs1d = vecs2d.get(i);
+    println(vecs1d);
+    sendOsc(vecs1d);
+  }
+}
+
+void sendOsc(List<PVector> _vectors) { //send from an flexible ArrayList
+  if (_vectors.size()>0) {
+    OscMessage msg = new OscMessage("/drawVertex");
+    for (int i =0; i<_vectors.size(); i++) { //Remember to cast to ints!
+      msg.add((int)_vectors.get(i).x);
+      msg.add((int)_vectors.get(i).y);
+    }
+    oscP5.send(msg, dest);
+    println("message sent " + msg);
+  } else {
+    println("vector not containing anything, message not sent");
+  }
+}
 
 static final int[] indicesOf(final List<?> list, final Object object) {
   if (list == null || list.isEmpty())  return new int[0];
