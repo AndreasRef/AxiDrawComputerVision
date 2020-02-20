@@ -157,7 +157,10 @@ void faceDetection() {
     println(faces[i].x + "," + faces[i].y);
     rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
   }
-  crossOutObject(faces);
+  //Perform actions: Be aware that you cannot do multiple actions currently, since sendToAxidraw will become false...
+  //crossOutObject(faces);
+  //randomLinesOverObject(faces);
+  horisontalScribbleOverObject(faces, 25);
   pop();
 }
 
@@ -186,3 +189,62 @@ void crossOutObject(Rectangle[] rects) {
   sendToAxidraw = false;
   vecs.clear(); //is this needed?
 } 
+
+void randomLinesOverObject(Rectangle[] rects) {
+  List<PVector> vecs = new ArrayList<PVector>();
+  
+  stroke(0,0,255);
+  for (int i = 0; i < rects.length; i++) {    
+    for (int n = 0; n<20; n++) {
+      vecs.add(new PVector(random(rects[i].x, rects[i].x + rects[i].width), random(rects[i].y, rects[i].y + rects[i].height)));
+    }
+    
+    displayVertex(vecs);
+  
+    //send to AxiDraw
+    if (sendToAxidraw) {
+      splitListsAndSendOSC(vecs);
+    }
+  }
+  sendToAxidraw = false;
+  vecs.clear(); //is this needed?
+} 
+
+
+void horisontalScribbleOverObject(Rectangle[] rects, int yStep) {
+  List<PVector> vecs = new ArrayList<PVector>();
+  
+  stroke(0);
+   for (int i = 0; i < rects.length; i++) {    
+    for (int y = 0; y<rects[i].height; y+=yStep) {
+      vecs.add(new PVector(rects[i].x, y+rects[i].y));
+      vecs.add(new PVector(rects[i].x+rects[i].width, y+rects[i].y + yStep/2));
+    }
+    displayVertex(vecs);
+    
+    //send to AxiDraw
+    if (sendToAxidraw) {
+      splitListsAndSendOSC(vecs);
+    }
+   }
+   sendToAxidraw = false;
+  vecs.clear(); //is this needed?
+}
+
+//util - does not work for vecs that have a delimiter...
+void displayVertex(List<PVector> _vecs) {
+    beginShape();
+    for (int j = 0; j<_vecs.size(); j++) {
+      vertex(_vecs.get(j).x, _vecs.get(j).y);
+    }
+    endShape(); 
+}
+
+//To do
+void paintMoustache(Rectangle[] rects) {
+  
+}
+
+void drawOnEyes(Rectangle[] rects) {
+  
+}
