@@ -7,14 +7,14 @@ import static java.util.Arrays.binarySearch;
 OscP5 oscP5;
 NetAddress dest;
 
-final List<PVector> vecs = new ArrayList<PVector>();
-final PVector DELIM_VEC = new PVector(0,0);
+List<PVector> vecs = new ArrayList<PVector>();
+final PVector DELIM_VEC = new PVector(0, 0);
 List<List<PVector>> vecs2d;
 
 void setup() {
-  oscP5 = new OscP5(this,9000);
+  oscP5 = new OscP5(this, 9000);
   dest = new NetAddress("127.0.0.1", 12000);
-  
+
   vecs.add(new PVector(100, 100));
   vecs.add(new PVector(150, 100));
   vecs.add(new PVector(150, 150));
@@ -24,15 +24,18 @@ void setup() {
   vecs.add(new PVector(350, 100)); 
   vecs.add(new PVector(350, 150)); 
   vecs.add(DELIM_VEC);
-  
+
   final int[] delimIndexes = indicesOf(vecs, DELIM_VEC);
 
   vecs2d = splitListAsList2d(vecs, delimIndexes);
 
-  for (final List<PVector> vecs1d : vecs2d) {
-    println(vecs1d); //This is where we get the correct lists..
+  for (int size = vecs2d.size(), i = 0; i < size; ++i) {
+    final List<PVector> vecs1d = vecs2d.get(i);
+    println(vecs1d);
     sendOsc(vecs1d);
   }
+
+  
   exit();
 }
 
