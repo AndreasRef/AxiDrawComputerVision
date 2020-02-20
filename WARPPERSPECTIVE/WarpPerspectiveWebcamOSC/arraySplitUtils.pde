@@ -1,4 +1,4 @@
-//https://discourse.processing.org/t/splitting-an-arraylist-for-each-pvector-0-0-updated/17883/12
+
 static final int[] indicesOf(final List<?> list, final Object object) {
   if (list == null || list.isEmpty())  return new int[0];
 

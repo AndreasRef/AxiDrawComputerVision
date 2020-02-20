@@ -1,6 +1,5 @@
 //To do
 //Function to calculate outPut coordinates to paper coordinates
-//Basic proof of concept example (but with which example)
 
 import processing.video.*;
 import gab.opencv.*;
@@ -19,9 +18,9 @@ import static java.util.Arrays.binarySearch;
 OscP5 oscP5;
 NetAddress dest;
 
-List<PVector> vecs = new ArrayList<PVector>();
+//List<PVector> vecs = new ArrayList<PVector>();
 final PVector DELIM_VEC = new PVector(0,0);
-List<List<PVector>> vecs2d;
+//List<List<PVector>> vecs2d;
 
 Capture video;
 OpenCV opencv;
@@ -59,6 +58,7 @@ void setup() {
   }
   
   //OSC test
+  List<PVector> vecs = new ArrayList<PVector>();
   vecs.add(new PVector(100, 100));
   vecs.add(new PVector(150, 100));
   vecs.add(new PVector(150, 150));
@@ -69,15 +69,7 @@ void setup() {
   vecs.add(new PVector(350, 150)); 
   vecs.add(DELIM_VEC);
   
-  final int[] delimIndexes = indicesOf(vecs, DELIM_VEC);
-
-  vecs2d = splitListAsList2d(vecs, delimIndexes);
-
-  for (int size = vecs2d.size(), i = 0; i < size; ++i) {
-    final List<PVector> vecs1d = vecs2d.get(i);
-    println(vecs1d);
-    sendOsc(vecs1d);
-  }
+  splitListsAndSendOSC(vecs);
 }
 
 void draw() {
@@ -110,6 +102,11 @@ void keyPressed() {
   //imageReady = true;
 }
 
+void mousePressed() {
+  
+}
+
+
 void performCV() {
   if (webcamMode) {
     opencv.loadImage(video);
@@ -125,6 +122,17 @@ void performCV() {
   opencv.blur(5);
   opencv.threshold(120);
   output = opencv.getOutput();
+}
+
+void splitListsAndSendOSC(List<PVector> _vectors) {
+  final int[] delimIndexes = indicesOf(_vectors, DELIM_VEC);
+  List<List<PVector>> vecs2d = splitListAsList2d(_vectors, delimIndexes);
+
+  for (int size = vecs2d.size(), i = 0; i < size; ++i) {
+    final List<PVector> vecs1d = vecs2d.get(i);
+    println(vecs1d);
+    sendOsc(vecs1d);
+  }
 }
 
 void sendOsc(List<PVector> _vectors) { //send from an flexible ArrayList
