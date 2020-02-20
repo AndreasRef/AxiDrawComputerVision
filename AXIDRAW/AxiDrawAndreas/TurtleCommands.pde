@@ -6,7 +6,7 @@ float currentAngle = 0.0; // facing right
 // Pen commands
 void penUp() {
   currentPenDown = false;
-  println("pen up");
+  //println("pen up");
   ToDoList = (PVector[]) append(ToDoList, new PVector(-30, 0)); //Command 30 (raise pen)
 }
 void u() {
@@ -15,7 +15,7 @@ void u() {
 
 void penDown() {
   currentPenDown = true;
-  println("pen down");
+  //println("pen down");
   ToDoList = (PVector[]) append(ToDoList, new PVector(-31, 0)); //Command 31 (lower pen)
 }
 void d() {
@@ -94,7 +94,7 @@ void moveTo(float x, float y) {
   currentX = x;
   currentY = y;
   penUp();
-  println("move to " + x + ", " + y);
+  //println("move to " + x + ", " + y);
   ToDoList = (PVector[]) append(ToDoList, new PVector(currentX + MousePaperLeft, currentY + MousePaperTop));
   //ToDoList = (PVector[]) append(ToDoList, new PVector(currentX, currentY));
 }
@@ -103,7 +103,7 @@ void lineTo(float x, float y) {
   currentX = x;
   currentY = y;
   penDown();
-  println("line to " + x + ", " + y);
+  //println("line to " + x + ", " + y);
   ToDoList = (PVector[]) append(ToDoList, new PVector(currentX + MousePaperLeft, currentY + MousePaperTop));
   //ToDoList = (PVector[]) append(ToDoList, new PVector(currentX, currentY));
 }

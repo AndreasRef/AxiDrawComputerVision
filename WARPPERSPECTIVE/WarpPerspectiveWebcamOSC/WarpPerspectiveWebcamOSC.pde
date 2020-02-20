@@ -36,6 +36,8 @@ Boolean webcamMode = true;
 
 Table table; //Table for storing perspectivePoints
 
+List<PVector> vecs = new ArrayList<PVector>();
+
 void setup() {
   size(640, 720);
   surface.setLocation(0, 100);
@@ -58,18 +60,23 @@ void setup() {
   }
   
   //OSC test
-  List<PVector> vecs = new ArrayList<PVector>();
   vecs.add(new PVector(100, 100));
   vecs.add(new PVector(150, 100));
   vecs.add(new PVector(150, 150));
-  vecs.add(DELIM_VEC); 
+  
+  
+  //vecs.add(DELIM_VEC); 
   vecs.add(new PVector(300, 100)); 
-  vecs.add(DELIM_VEC); 
+  //vecs.add(DELIM_VEC); 
   vecs.add(new PVector(350, 100)); 
   vecs.add(new PVector(350, 150)); 
-  vecs.add(DELIM_VEC);
+  //vecs.add(DELIM_VEC);
+  
   
   splitListsAndSendOSC(vecs);
+  
+  vecs.clear();
+  //vecs.add(DELIM_VEC);
 }
 
 void draw() {
@@ -102,10 +109,19 @@ void keyPressed() {
   //imageReady = true;
 }
 
-void mousePressed() {
-  
+/* mouse drag test, works :-D
+
+void mouseDragged() {
+  vecs.add(new PVector(mouseX, mouseY));
 }
 
+
+void mouseReleased() {
+  println("mouse released");
+  vecs.add(DELIM_VEC); 
+  splitListsAndSendOSC(vecs);
+}
+*/
 
 void performCV() {
   if (webcamMode) {

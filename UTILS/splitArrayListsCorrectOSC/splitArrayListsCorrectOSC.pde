@@ -32,8 +32,6 @@ void splitListsAndSendOSC(List<PVector> _vectors) {
   final int[] delimIndexes = indicesOf(_vectors, DELIM_VEC);
   List<List<PVector>> vecs2d = splitListAsList2d(_vectors, delimIndexes);
 
-  println(vecs2d.size());
-
   if (vecs2d.size() > 0) { //in cases where there is a delimiter
     for (int size = vecs2d.size(), i = 0; i < size; ++i) {
       final List<PVector> vecs1d = vecs2d.get(i);
