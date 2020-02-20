@@ -1,0 +1,4 @@
+- Basic simplest possible
+- Track face and cross it out
+- PolygonFitting
+- Keras
