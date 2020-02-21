@@ -18,8 +18,9 @@ void sendOsc(List<PVector> _vectors) { //send from an flexible ArrayList
   if (_vectors.size()>0) {
     OscMessage msg = new OscMessage("/drawVertex");
     for (int i =0; i<_vectors.size(); i++) { //Remember to cast to ints!
-      msg.add((int)_vectors.get(i).x);
-      msg.add((int)_vectors.get(i).y);
+      // here you should scale according to resolution
+      msg.add(int(_vectors.get(i).x*xScaleFactor));
+      msg.add(int(_vectors.get(i).y*yScaleFactor));
     }
     oscP5.send(msg, dest);
     println("message sent " + msg);
