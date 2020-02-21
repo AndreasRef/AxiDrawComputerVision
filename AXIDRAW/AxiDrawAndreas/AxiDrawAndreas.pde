@@ -8,11 +8,22 @@ void setup() {
   setupAxi();
   oscP5 = new OscP5(this, 12000);
 
-  moveTo(10, 10);
+  /*
+  moveTo(0, 0);
   penDown();
-  lineTo(50, 10);
+  lineTo(0+2, 0+2);
   penUp();
+  
+  //screen max is for A4 X: 740   Y= 523
+  println(MousePaperRight-MousePaperLeft);
+  println(MousePaperBottom-MousePaperTop);
+  moveTo(MousePaperRight-MousePaperLeft, MousePaperBottom-MousePaperTop);
+  penDown();
+  lineTo(MousePaperRight-MousePaperLeft-2, MousePaperBottom-MousePaperTop-2);
+  penUp();
+  
   //moveTo(0, 0);
+  */
 
   vectors[0] = new PVector(100, 100);
   vectors[1] = new PVector(150, 100);
@@ -23,6 +34,17 @@ void setup() {
 
 void draw() {
   drawAxi(); 
+  
+  if (frameCount < 100) {
+   push();
+   fill(255,0,0);
+   rect(10,10, width-10, height-10);
+   fill(0);
+   textSize(64);
+   text("Move to outer corner \nbefore touching anything", 100, 100);
+   
+   pop();
+  }
   //if (frameCount % 20 == 0) drawSimpleRect(int(random(500)), int(random(500)), 20, 20);
 }
 
