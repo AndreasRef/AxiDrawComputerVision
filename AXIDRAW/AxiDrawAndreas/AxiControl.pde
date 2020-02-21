@@ -4,7 +4,7 @@ import de.looksgood.ani.*;
 import processing.serial.*;
 
 // User Settings: 
-float MotorSpeed = 6000.0;  // Steps per second, 1500 default
+float MotorSpeed = 4000.0;  // Steps per second, 1500 default
 
 int ServoUpPct = 70;    // Brush UP position, %  (higher number lifts higher). 
 int ServoPaintPct = 30;    // Brush DOWN position, %  (higher number lifts higher). 
@@ -17,7 +17,7 @@ int delayAfterLoweringBrush = 300; //ms
 
 boolean debugMode = false;
 
-boolean PaperSizeA4 = false; // true for A4. false for US letter.
+boolean PaperSizeA4 = true; // true for A4. false for US letter.
 
 // Offscreen buffer images for holding drawn elements, makes redrawing MUCH faster
 PGraphics offScreen;
