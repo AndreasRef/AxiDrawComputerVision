@@ -48,7 +48,8 @@ void setup() {
   
   if (webcamMode) {
     String[] cameras = Capture.list();
-    video = new Capture(this, 640, 360, cameras[0]);
+    println(cameras);
+    video = new Capture(this, 640, 360, cameras[1]);
     video.start();
     opencv = new OpenCV(this, video);
     imageReady = false;
@@ -135,7 +136,7 @@ void performCV() {
   
   //Post effects
   opencv.loadImage(output);
-  opencv.blur(5);
-  opencv.threshold(120);
+  //opencv.blur(5);
+  opencv.threshold(60);
   output = opencv.getOutput();
 }
