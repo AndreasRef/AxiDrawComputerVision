@@ -39,6 +39,9 @@ Table table; //Table for storing perspectivePoints
 
 boolean sendToAxidraw = false;
 
+float xScaleFactor = 740.0/640.0;
+float yScaleFactor = 523.0/360.0;
+
 void setup() {
   size(640, 720);
   surface.setLocation(0, 100);
@@ -49,7 +52,8 @@ void setup() {
   
   if (webcamMode) {
     String[] cameras = Capture.list();
-    video = new Capture(this, 640, 360, cameras[0]);
+    println(cameras);
+    video = new Capture(this, 640, 360, cameras[1]);
     video.start();
     opencv = new OpenCV(this, video);
     imageReady = false;
@@ -77,7 +81,7 @@ void setup() {
   //vecs.add(DELIM_VEC);
   
   
-  splitListsAndSendOSC(vecs);
+  //splitListsAndSendOSC(vecs);
   
   vecs.clear();
   //vecs.add(DELIM_VEC);
@@ -145,7 +149,7 @@ void performCV() {
 
 void faceDetection() {
   Rectangle[] faces = opencv.detect();
-  println(faces.length);
+  //println(faces.length);
   
   push();
   translate(0, 360);
@@ -154,13 +158,13 @@ void faceDetection() {
   stroke(0,255,0);
   strokeWeight(2);
   for (int i = 0; i < faces.length; i++) {
-    println(faces[i].x + "," + faces[i].y);
+    //println(faces[i].x + "," + faces[i].y);
     rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
   }
   //Perform actions: Be aware that you cannot do multiple actions currently, since sendToAxidraw will become false...
   //crossOutObject(faces);
   //randomLinesOverObject(faces);
-  horisontalScribbleOverObject(faces, 25);
+  horisontalScribbleOverObject(faces, 4);
   pop();
 }
 
@@ -192,6 +196,7 @@ void crossOutObject(Rectangle[] rects) {
 
 void randomLinesOverObject(Rectangle[] rects) {
   List<PVector> vecs = new ArrayList<PVector>();
+  vecs.add(DELIM_VEC);
   
   stroke(0,0,255);
   for (int i = 0; i < rects.length; i++) {    
