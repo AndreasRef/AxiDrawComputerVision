@@ -2,7 +2,7 @@
 
 //Better CV interface, so you can actually sense what the computer sees
 //Long term: Place white stuff where you just drew, to avoid drawing on top of the same figure again
-
+//For this see UTILS/PImageSetPixels
 
 //PolygonFitting
 import boofcv.processing.*;
