@@ -114,6 +114,9 @@ void performCV() {
   translate(0, 360);
   if (imageReady) image(output, 0, 0); 
   pop();  
+  
+  //Do specific action
+  faceDetection();
 }
 
 
