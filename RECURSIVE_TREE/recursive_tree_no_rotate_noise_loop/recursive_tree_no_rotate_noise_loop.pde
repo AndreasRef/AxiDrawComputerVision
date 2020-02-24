@@ -1,13 +1,17 @@
 float theta;   
 
+float randIncrementer = 0.0;
+
+int branchN = 0;
+
 void setup() {
   size(640, 360);
-  noLoop();
+  //noLoop();
 }
 
 void draw() {
   background(0);
-  frameRate(30);
+  frameRate(10);
   stroke(255);
   // Let's pick an angle 0 to 95 degrees based on the mouse position
   //float a = (mouseX / (float) width) * 95f;
@@ -17,15 +21,29 @@ void draw() {
   // Convert it to radians
   theta = radians(a);
   // Start the recursive branching!
-  branch(new PVector(width/2, height-120), -PI/2, theta, 120);
+  branch(new PVector(width/2, height-120), -PI/2, theta, 120, 0);
 }
 
 //Recursion without translate + rotate: https://discourse.processing.org/t/recursive-tree-without-using-rotate/17080/5
-void branch(PVector parent, float branch_angle, float delta_angle, float h) {  
+void branch(PVector parent, float branch_angle, float delta_angle, float h, int bN) {  
+  
+  bN+=1;
+  
+  branchN +=bN;
+  //println(branchN);
   // Each branch will be 2/3rds the size of the previous one
-  h *= random(0.5,0.75);
-  //h*=0.66;
+  //h *= random(0.5,0.75);
+  h*=0.25 + (noise(branchN)+1)*0.25;
+  
+  //println((noise(branchN)+1)*0.15);
+  
+  //println(h);
+  
+  //h*= (sin(randIncrementer)+1 + 0.5); /
+  
+  //println(sin(randIncrementer)+1 + 0.5);
   if (h > 2) {
+    
     float ccw_angle, cw_angle, delta_x, delta_y, lineEnd_x, lineEnd_y;
     // Left branch
     //Anticlockwise branch
@@ -35,8 +53,16 @@ void branch(PVector parent, float branch_angle, float delta_angle, float h) {
     lineEnd_x = parent.x + delta_x;
     lineEnd_y = parent.y + delta_y;
     //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
-    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, random(100), random(100)); 
-    branch(new PVector(lineEnd_x, lineEnd_y), ccw_angle, delta_angle, h);
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, bN, bN); 
+    
+    bN+=1;
+    branchN +=bN;
+    push();
+    fill(255,0,0);
+    //text(branchN, lineEnd_x, lineEnd_y);
+    pop();
+    
+    branch(new PVector(lineEnd_x, lineEnd_y), ccw_angle, delta_angle, h, bN);
     // Right branch
     //Anticlockwise branch
     cw_angle = branch_angle + delta_angle;
@@ -45,14 +71,24 @@ void branch(PVector parent, float branch_angle, float delta_angle, float h) {
     lineEnd_x = parent.x + delta_x;
     lineEnd_y = parent.y + delta_y;
     //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
-    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, random(100), random(100)); 
-    branch(new PVector(lineEnd_x, lineEnd_y), cw_angle, delta_angle, h);
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, bN, bN); 
+    bN+=1;
+    branchN +=bN;
+    push();
+    fill(255,0,0);
+    //text(branchN, lineEnd_x, lineEnd_y);
+    pop();
+    
+    branch(new PVector(lineEnd_x, lineEnd_y), cw_angle, delta_angle, h, bN);
+    //println(bN);
+    
+  } else {
+   //println("stop!"); 
+   branchN = 0;
+   //println("reset " + bN);
   }
 }
 
-void mousePressed() {
- redraw(); 
-}
 
 
 void noisyLine(PVector start, PVector stop, float incStep, float noiseFactor, float noiseInc, float xOff, float yOff) {
