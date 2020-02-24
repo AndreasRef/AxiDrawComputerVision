@@ -1,13 +1,11 @@
 //For webcam see https://github.com/bitcraftlab/opencv-webcam-processing/blob/master/examples/LiveCamFindContours/LiveCamFindContours.pde
 
-/*To do: Get some measurement for how curvy the lines are...
+/*To do: 
+
+ Make each branch more unique by somewow embedding noise into it in a non-fucked way (keep it out of draw)?
+ Get some measurement for how curvy the lines are...
  Clean up UI
  Improve noise thing
- Nice to have: Timing thing for the drawing of lines
- Could we get rid of the translate? Will sync with the AxiDraw? I Guess it should work, since there is a "move relative" function...
- https://github.com/evil-mad/AxiDraw-Processing/blob/master/AxiGen1/AxiControl.pde
- Could we get rid of rotate? I am not sure how that would work with Axidraw...
- Could I re-write the entire branch function with vectors only...?
  */
 
 import gab.opencv.*;
@@ -22,6 +20,8 @@ PGraphics pg;
 float theta;
 
 float xOffLeft, yOffLeft, xOffRight, yOffRight;
+
+int branchN = 0;
 
 void setup() {
   src = loadImage("line.jpg"); 
@@ -97,17 +97,23 @@ void draw() {
       a = min(a, 90); // then cap it at 90 degrees
       theta = radians(a); // Convert it to radians
       
-      println(branchA);
-      branch(topPoint, branchA, theta, diffVector.mag());
+      //println(branchA);
+      stroke(0);
+      strokeWeight(1);
+      branch(topPoint, branchA, theta, diffVector.mag(), 0);
     }
   }
 }
 //Recursion without translate + rotate: https://discourse.processing.org/t/recursive-tree-without-using-rotate/17080/5
-void branch(PVector parent, float branch_angle, float delta_angle, float h) {  
-  // Each branch will be 2/3rds the size of the previous one
-  //h *= random(0.5,0.75);
-  h *= 0.66;
-  if (h > 2) {
+void branch(PVector parent, float branch_angle, float delta_angle, float h, int bN) {  
+  
+  bN+=1;
+  branchN +=bN;
+  float hMult = constrain((noise(branchN)+1)*0.99-0.70, 0.01, 0.7);
+  
+  h*= hMult;
+  
+  if (h > 3) {
     float ccw_angle, cw_angle, delta_x, delta_y, lineEnd_x, lineEnd_y;
     // Left branch
     //Anticlockwise branch
@@ -117,23 +123,27 @@ void branch(PVector parent, float branch_angle, float delta_angle, float h) {
     lineEnd_x = parent.x + delta_x;
     lineEnd_y = parent.y + delta_y;
     //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
-    //noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, random(100), random(100)); 
-    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, xOffLeft, yOffLeft);
-    branch(new PVector(lineEnd_x, lineEnd_y), ccw_angle, delta_angle, h);
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 10.0, 0.1, branchN, branchN + bN); 
+   
+    bN+=1;
+    branchN +=bN;
+    
+    branch(new PVector(lineEnd_x, lineEnd_y), ccw_angle, delta_angle, h, bN);
     // Right branch
     //Anticlockwise branch
     cw_angle = branch_angle + delta_angle;
     delta_x = h * cos(cw_angle);
     delta_y = h * sin(cw_angle);
     lineEnd_x = parent.x + delta_x;
-    lineEnd_y = parent.y + delta_y;
-    //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
-    //noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, random(100), random(100));
-    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, xOffRight, yOffRight);
-    branch(new PVector(lineEnd_x, lineEnd_y), cw_angle, delta_angle, h);
+    lineEnd_y = parent.y + delta_y;;
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 10.0, 0.1, branchN + 100, branchN - bN); 
+    bN+=1;
+    branchN +=bN;
+    branch(new PVector(lineEnd_x, lineEnd_y), cw_angle, delta_angle, h, bN);
+  } else {
+   branchN = 0;
   }
 }
-
 
 
 
@@ -158,5 +168,6 @@ void noisyLine(PVector start, PVector stop, float incStep, float noiseFactor, fl
 void keyPressed() {
   if (key == ' ' ) {
     pg.clear();
+    noiseSeed((long)random(100));
   }
 }

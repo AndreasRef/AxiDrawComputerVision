@@ -1,12 +1,10 @@
 float theta;   
 
 float randIncrementer = 0.0;
-
 int branchN = 0;
 
 void setup() {
   size(640, 360);
-  //noLoop();
 }
 
 void draw() {
@@ -21,29 +19,19 @@ void draw() {
   // Convert it to radians
   theta = radians(a);
   // Start the recursive branching!
-  branch(new PVector(width/2, height-120), -PI/2, theta, 120, 0);
+  branch(new PVector(width/2, height-100), -PI/2, theta, 120, 0);
 }
 
 //Recursion without translate + rotate: https://discourse.processing.org/t/recursive-tree-without-using-rotate/17080/5
 void branch(PVector parent, float branch_angle, float delta_angle, float h, int bN) {  
   
   bN+=1;
-  
   branchN +=bN;
-  //println(branchN);
-  // Each branch will be 2/3rds the size of the previous one
-  //h *= random(0.5,0.75);
-  h*=0.25 + (noise(branchN)+1)*0.25;
+  float hMult = constrain((noise(branchN)+1)*0.99-0.70, 0.01, 0.7);
   
-  //println((noise(branchN)+1)*0.15);
+  h*= hMult;
   
-  //println(h);
-  
-  //h*= (sin(randIncrementer)+1 + 0.5); /
-  
-  //println(sin(randIncrementer)+1 + 0.5);
-  if (h > 2) {
-    
+  if (h > 3) {
     float ccw_angle, cw_angle, delta_x, delta_y, lineEnd_x, lineEnd_y;
     // Left branch
     //Anticlockwise branch
@@ -53,14 +41,10 @@ void branch(PVector parent, float branch_angle, float delta_angle, float h, int 
     lineEnd_x = parent.x + delta_x;
     lineEnd_y = parent.y + delta_y;
     //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
-    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, bN, bN); 
-    
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, branchN, branchN + bN); 
+   
     bN+=1;
     branchN +=bN;
-    push();
-    fill(255,0,0);
-    //text(branchN, lineEnd_x, lineEnd_y);
-    pop();
     
     branch(new PVector(lineEnd_x, lineEnd_y), ccw_angle, delta_angle, h, bN);
     // Right branch
@@ -69,23 +53,13 @@ void branch(PVector parent, float branch_angle, float delta_angle, float h, int 
     delta_x = h * cos(cw_angle);
     delta_y = h * sin(cw_angle);
     lineEnd_x = parent.x + delta_x;
-    lineEnd_y = parent.y + delta_y;
-    //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
-    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, bN, bN); 
+    lineEnd_y = parent.y + delta_y;;
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, branchN + 100, branchN - bN); 
     bN+=1;
     branchN +=bN;
-    push();
-    fill(255,0,0);
-    //text(branchN, lineEnd_x, lineEnd_y);
-    pop();
-    
     branch(new PVector(lineEnd_x, lineEnd_y), cw_angle, delta_angle, h, bN);
-    //println(bN);
-    
   } else {
-   //println("stop!"); 
    branchN = 0;
-   //println("reset " + bN);
   }
 }
 
@@ -100,8 +74,8 @@ void noisyLine(PVector start, PVector stop, float incStep, float noiseFactor, fl
     float softener = min(abs(1.0-abs(0.5-i)*2),0.8); //make noiseFactor less in the ends to avoid ugly cuts...
     lerpVector.add((noise(xOff)-0.5)*noiseFactor*softener,(noise(yOff)-0.5)*noiseFactor*softener,0);
     vertex(lerpVector.x, lerpVector.y);
-    //xOff+=noiseInc;
-    //yOff+=noiseInc;
+    xOff+=noiseInc;
+    yOff+=noiseInc;
   }
   vertex(stop.x, stop.y);
   endShape();
