@@ -21,6 +21,8 @@ PGraphics pg;
 
 float theta;
 
+float xOffLeft, yOffLeft, xOffRight, yOffRight;
+
 void setup() {
   src = loadImage("line.jpg"); 
   src.resize(540, 360);
@@ -33,6 +35,11 @@ void setup() {
   pg.beginDraw();
   pg.background(255);
   pg.endDraw();
+  
+  xOffLeft = random(100);
+  yOffLeft = random(100);
+  xOffRight = random(100);
+  yOffRight = random(100); 
 }
 
 void draw() {
@@ -71,7 +78,6 @@ void draw() {
       for (PVector point : contour.getPolygonApproximation().getPoints()) {
         vertex(point.x, point.y);
         ellipse(point.x, point.y, 4, 4);
-
         if (point.y < topPoint.y) topPoint.set(point.x, point.y);
         if (point.y > bottomPoint.y) bottomPoint.set(point.x, point.y);
       }
@@ -84,108 +90,70 @@ void draw() {
       ellipse(bottomPoint.x, bottomPoint.y, 10, 10);
       pop();
 
-      //NEW
       PVector diffVector = PVector.sub(bottomPoint, topPoint);    
-      float branchA = -(atan2(diffVector.x, diffVector.y));
-      
-      //branchA = degrees(branchA);
-      
-      float a = 30;
-      // then cap it at 90 degrees
-      a = min(a, 90); 
-      
-      
-      
-      // Convert it to radians
-      theta = radians(a);
-      
+      float branchA = -atan2(diffVector.x, diffVector.y)-PI/2;
+            
+      float a = 30; //Angle for branch spread
+      a = min(a, 90); // then cap it at 90 degrees
+      theta = radians(a); // Convert it to radians
       
       println(branchA);
-      // Start the recursive branching!
-      //branch(topPoint, -PI/2, theta, 120);
-      branch(topPoint, branchA-PI/2, theta, 120);
-
-      /* OLD
-       //Draw recursive trees
-
-       println("a: " + a);  
-       
-       pushMatrix();
-       pushStyle();
-       translate(topPoint.x, topPoint.y);
-       stroke(125, 0, 125);
-       line(0, 0, diffVector.x, diffVector.y);
-       rotate((a)); 
-       stroke(255, 0, 255);
-       if (mousePressed == false) branch(diffVector.mag(), 0); 
-       popStyle();
-       popMatrix();
-       */
+      branch(topPoint, branchA, theta, diffVector.mag());
     }
   }
 }
-
 //Recursion without translate + rotate: https://discourse.processing.org/t/recursive-tree-without-using-rotate/17080/5
 void branch(PVector parent, float branch_angle, float delta_angle, float h) {  
   // Each branch will be 2/3rds the size of the previous one
+  //h *= random(0.5,0.75);
   h *= 0.66;
   if (h > 2) {
-    float ccw_angle, cw_angle, delta_x, delta_y;
+    float ccw_angle, cw_angle, delta_x, delta_y, lineEnd_x, lineEnd_y;
     // Left branch
     //Anticlockwise branch
     ccw_angle = branch_angle - delta_angle;
     delta_x = h * cos(ccw_angle);
     delta_y = h * sin(ccw_angle);
-    line(parent.x, parent.y, parent.x + delta_x, parent.y + delta_y);
-    branch(new PVector(parent.x + delta_x, parent.y + delta_y), ccw_angle, delta_angle, h);
+    lineEnd_x = parent.x + delta_x;
+    lineEnd_y = parent.y + delta_y;
+    //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
+    //noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, random(100), random(100)); 
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, xOffLeft, yOffLeft);
+    branch(new PVector(lineEnd_x, lineEnd_y), ccw_angle, delta_angle, h);
     // Right branch
     //Anticlockwise branch
     cw_angle = branch_angle + delta_angle;
     delta_x = h * cos(cw_angle);
     delta_y = h * sin(cw_angle);
-    line(parent.x, parent.y, parent.x + delta_x, parent.y + delta_y);
-    branch(new PVector(parent.x + delta_x, parent.y + delta_y), cw_angle, delta_angle, h);
+    lineEnd_x = parent.x + delta_x;
+    lineEnd_y = parent.y + delta_y;
+    //line(parent.x, parent.y, lineEnd_x, lineEnd_y);
+    //noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, random(100), random(100));
+    noisyLine(parent, new PVector(lineEnd_x, lineEnd_y), 0.15, 5.0, 0.1, xOffRight, yOffRight);
+    branch(new PVector(lineEnd_x, lineEnd_y), cw_angle, delta_angle, h);
   }
 }
 
 
-void branch(float h, float lineAngle) {
-  float theta = radians(30);
-  // Each branch will be x the size of the previous one
-  h *= 0.6;
-
-  // All recursive functions must have an exit condition!!!!
-  // Here, ours is when the length of the branch is x pixels or less
-  if (h > 2) {
-    pushMatrix();    // Save the current state of transformation (i.e. where are we now)
-    rotate(theta + radians(lineAngle));   // Rotate by theta
-    //line(0, 0, 0, -h);  // Draw the branch as straight line
-    //draw the branch more curved/random
-    drawNoisyBranches(h, 10);
-    translate(0, -h); // Move to the end of the branch
-    branch(h, lineAngle);       // Ok, now call myself to draw two new branches!!
-    popMatrix();     // Whenever we get back here, we "pop" in order to restore the previous matrix state
-
-    // Repeat the same thing, only branch off to the "left" this time!
-    pushMatrix();
-    rotate(-theta+radians(lineAngle));
-    //line(0, 0, 0, -h);  // Draw the branch as straight line
-    //draw the branch more curved/random
-    drawNoisyBranches(h, 10);
-    translate(0, -h);
-    branch(h, lineAngle);
-    popMatrix();
-  }
-}
 
 
-void drawNoisyBranches(float h, float noiseFactor) { //Needs more work!
+void noisyLine(PVector start, PVector stop, float incStep, float noiseFactor, float noiseInc, float xOff, float yOff) {
+  noFill();
   beginShape();
-  for (int i =0; i<h; i+=5) {
-    vertex(noise(i*0.001)*noiseFactor-noiseFactor/2, -i);
+  vertex(start.x, start.y);
+  for (float i = incStep; i<1; i+=incStep) {
+    PVector lerpVector = PVector.lerp(start,stop,i);
+    float softener = min(abs(1.0-abs(0.5-i)*2),0.8); //make noiseFactor less in the ends to avoid ugly cuts...
+    lerpVector.add((noise(xOff)-0.5)*noiseFactor*softener,(noise(yOff)-0.5)*noiseFactor*softener,0);
+    vertex(lerpVector.x, lerpVector.y);
+    xOff+=noiseInc;
+    yOff+=noiseInc;
   }
+  vertex(stop.x, stop.y);
   endShape();
 }
+
+
 
 void keyPressed() {
   if (key == ' ' ) {
