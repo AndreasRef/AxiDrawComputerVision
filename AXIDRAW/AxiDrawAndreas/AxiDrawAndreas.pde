@@ -7,6 +7,7 @@ void setup() {
   surface.setLocation(displayWidth-width,0);
   setupAxi();
   oscP5 = new OscP5(this, 12000);
+  
 
   /*
   moveTo(0, 0);
@@ -50,7 +51,7 @@ void draw() {
 
 void mousePressed() { 
   if ((mouseX >= MousePaperLeft) && (mouseX <= MousePaperRight) && (mouseY >= MousePaperTop) && (mouseY <= MousePaperBottom)) { 
-    drawSimpleRect(mouseX-MousePaperLeft, mouseY-MousePaperTop, 20, 20);
+    //drawSimpleRect(mouseX-MousePaperLeft, mouseY-MousePaperTop, 20, 20);
   }
   checkButtons();
 }
