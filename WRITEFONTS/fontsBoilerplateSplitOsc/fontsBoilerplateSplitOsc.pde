@@ -32,7 +32,6 @@ void setup() {
   dest = new NetAddress("127.0.0.1", 12000);
 
   RG.init(this);
-  //font = new RFont(fontNames[0], 50, RFont.LEFT);
   font = new RFont(fontNames[0], fontSize, RFont.LEFT);
 
   RCommand.setSegmentLength (segmentLength);
@@ -63,7 +62,7 @@ void keyPressed() {
 
 
 void mousePressed() {
-  myText = str(random(10));
+  //myText = str(random(10));
 }
 
 void drawFonts(RPoint[] pnts, PVector tVec) {

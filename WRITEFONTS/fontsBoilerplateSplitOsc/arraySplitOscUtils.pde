@@ -5,40 +5,14 @@ void splitListsAndSendOSC(List<PVector> _vectors) {
   if (vecs2d.size() > 0) { //in cases where there is a delimiter
     for (int size = vecs2d.size(), i = 0; i < size; ++i) {
       final List<PVector> vecs1d = vecs2d.get(i);
-      println(vecs1d);
+      //println(vecs1d);
       sendOsc(vecs1d);
     }
   } else if (_vectors.size()>1) { //in cases where there is no delimiter
-    println(_vectors);
+    //println(_vectors);
     sendOsc(_vectors);
   }
 }
-
-void splitListsAndDraw(List<PVector> _vectors) {
-  final int[] delimIndexes = indicesOf(_vectors, DELIM_VEC);
-  List<List<PVector>> vecs2d = splitListAsList2d(_vectors, delimIndexes);
-
-  if (vecs2d.size() > 0) { //in cases where there is a delimiter
-    for (int size = vecs2d.size(), i = 0; i < size; ++i) {
-      final List<PVector> vecs1d = vecs2d.get(i);
-      println(vecs1d);
-      displayVertex(vecs1d);
-    }
-  } else if (_vectors.size()>1) { //in cases where there is no delimiter
-    //println(_vectors);
-    displayVertex(_vectors);
-  }
-}
-
-
-void displayVertex(List<PVector> _vecs) {
-    beginShape();
-    for (int j = 0; j<_vecs.size(); j++) {
-      vertex(_vecs.get(j).x, _vecs.get(j).y);
-    }
-    endShape(); 
-}
-
 
 void sendOsc(List<PVector> _vectors) { //send from an flexible ArrayList
   if (_vectors.size()>0) {
@@ -55,6 +29,30 @@ void sendOsc(List<PVector> _vectors) { //send from an flexible ArrayList
   }
 }
 
+
+void splitListsAndDraw(List<PVector> _vectors) {
+  final int[] delimIndexes = indicesOf(_vectors, DELIM_VEC);
+  List<List<PVector>> vecs2d = splitListAsList2d(_vectors, delimIndexes);
+
+  if (vecs2d.size() > 0) { //in cases where there is a delimiter
+    for (int size = vecs2d.size(), i = 0; i < size; ++i) {
+      final List<PVector> vecs1d = vecs2d.get(i);
+      //println(vecs1d);
+      displayVertex(vecs1d);
+    }
+  } else if (_vectors.size()>1) { //in cases where there is no delimiter
+    //println(_vectors);
+    displayVertex(_vectors);
+  }
+}
+
+void displayVertex(List<PVector> _vecs) {
+    beginShape();
+    for (int j = 0; j<_vecs.size(); j++) {
+      vertex(_vecs.get(j).x, _vecs.get(j).y);
+    }
+    endShape(); 
+}
 
 static final int[] indicesOf(final List<?> list, final Object object) {
   if (list == null || list.isEmpty())  return new int[0];

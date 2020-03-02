@@ -17,9 +17,9 @@ void setup() {
   vecs.add(new PVector(100, 100));
   vecs.add(new PVector(150, 100));
   vecs.add(new PVector(150, 150));
-  //vecs.add(DELIM_VEC); 
-  vecs.add(new PVector(300, 100)); 
-  //vecs.add(DELIM_VEC); 
+  vecs.add(DELIM_VEC); 
+  vecs.add(new PVector(50, 50)); 
+  vecs.add(DELIM_VEC); 
   vecs.add(new PVector(350, 100)); 
   vecs.add(new PVector(350, 150)); 
   //vecs.add(DELIM_VEC);
