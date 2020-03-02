@@ -15,9 +15,9 @@ float yScaleFactor = 523.0/360.0;
 RFont font;
 String myText = "Type";
 
-String fontNames[] = {"1CamBam_Stick_9.ttf", "Akkurat-Light.ttf"}; //Only ttf's work...
+String fontNames[] = {"1CamBam_Stick_5.ttf", "Akkurat-Light.ttf"}; //Only ttf's work...
 
-int segmentLength = 25;
+int segmentLength = 5;
 
 boolean sendToAxidraw = false;
 
@@ -28,7 +28,7 @@ void setup() {
   dest = new NetAddress("127.0.0.1", 12000);
 
   RG.init(this);
-  font = new RFont(fontNames[0], 200, RFont.LEFT);
+  font = new RFont(fontNames[0], 50, RFont.LEFT);
 
   RCommand.setSegmentLength (segmentLength);
   RCommand.setSegmentator(RCommand.UNIFORMLENGTH);
@@ -67,7 +67,6 @@ void drawFonts(RPoint[] pnts) {
         ellipse(pnts[i].x+20, pnts[i].y+220, 5, 5);
       }
   }
-  
   
   splitListsAndDraw(vecs);
   
