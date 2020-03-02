@@ -42,7 +42,7 @@ void draw() {
     //How do figure out when to lift the Axidraw arm? 
 
     stroke(0);    
-    drawUsingPoints(pnts);
+    //drawUsingPoints(pnts);
     
     translate(20, 20);
     stroke(0,255,0);
