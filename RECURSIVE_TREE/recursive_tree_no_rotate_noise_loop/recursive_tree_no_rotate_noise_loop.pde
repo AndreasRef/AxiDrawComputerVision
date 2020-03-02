@@ -1,6 +1,5 @@
 float theta;   
 
-float randIncrementer = 0.0;
 int branchN = 0;
 
 void setup() {
