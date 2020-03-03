@@ -1,6 +1,6 @@
 /*To do: 
  What if the point is just a single one? That needs to be drawn as well... I think it gets drawn on paper, even though AxiDraw screen simulation doesn't show it...
- Make line breaks if text goes beyond line...
+ 
  */
 
 import geomerative.*;
@@ -16,13 +16,13 @@ final PVector DELIM_VEC = new PVector(0, 0);
 
 float xScaleFactor = 740.0/640.0;
 float yScaleFactor = 523.0/360.0;
-boolean sendToAxidraw = false;
+boolean sendToAxidraw = true;
 
 RFont font;
 String myText = "Hej verden, What if the point is just a single one? That needs to be drawn as well... I think it gets drawn on paper, even though AxiDraw screen simulation doesn't show it... Make line breaks if text goes beyond line...";
-String fontNames[] = {"1CamBam_Stick_9.ttf", "Akkurat-Light.ttf"}; //Only ttf's work...
+String fontNames[] = {"1CamBam_Stick_5.ttf", "Akkurat-Light.ttf"}; //Only ttf's work...
 int fontSize = 50;
-int segmentLength = round(fontSize/5); //Small segmentLenghts gives speed at the cost of accurracy 
+int segmentLength = round(fontSize/8); //Small segmentLenghts gives speed at the cost of accurracy 
 
 PVector translateVec = new PVector(20, 120);
 
@@ -112,6 +112,6 @@ void drawFonts(RPoint[] pnts, PVector tVec) {
   if (sendToAxidraw) {  
     splitListsAndSendOSC(vecs);
   }
-  sendToAxidraw = false;
+  //sendToAxidraw = false;
   translateVec.add(recordX, 0);
 }
